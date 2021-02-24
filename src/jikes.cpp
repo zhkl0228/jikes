@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
                StringConstant::U8S_command_format);
         printf("\n"
                "\tRegular options:\n"
-               "-bootclasspath path location of system classes [default '']\n"
+               "-bootclasspath path location of system classes [default '../lib/rt.jar']\n"
                "-classpath path     location of user classes and source files [default .]\n"
                "-d dir              write class files in directory dir [default .]\n"
                "-debug              no effect (ignored for compatibility)\n"
@@ -113,6 +113,19 @@ int main(int argc, char *argv[])
     }
     else if (files && files[0])
     {
+        if(!compiler->getOptions()->bootclasspath) {
+            char path[256];
+            memcpy(path, argv[0], strlen(argv[0]));
+            char *split = path;
+            char *tmp = NULL;
+            while((tmp = strchr(split + 1, '/'))) {
+                split = tmp;
+            }
+            split[0] = 0;
+            char *buf = (char *) calloc(1, 256);
+            sprintf(buf, "%s%s", path, "/../lib/rt.jar");
+            compiler->getOptions()->bootclasspath = buf;
+        }
         return_code = compiler -> compile(files);
     }
     else
